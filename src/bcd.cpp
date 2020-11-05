@@ -1184,4 +1184,26 @@ BigInt BigInt::neg() const
 	return rt;
 }
 
+BigInt BigInt::pow( unsigned long opr) const
+{
+	BigInt ar[ sizeof opr * 8];
+	std::size_t ai = 1, ae = sizeof opr * 8;
+	std::size_t mask = 1;
+	ar[ 0] = *this;
+	for (; ai != ae && (unsigned long)mask <= opr; ++ai,mask <<= 1)
+	{
+		ar[ ai] = ar[ ai-1] * ar[ ai-1];
+	}
+	BigInt rt( "1", 1);
+	mask = 1;
+	ai = 0;
+	for (; ai != ae && (unsigned long)mask <= opr; ++ai,mask <<= 1)
+	{
+		if (opr & mask)
+		{
+			rt = rt * ar[ ai];
+		}
+	}
+	return rt;
+}
 

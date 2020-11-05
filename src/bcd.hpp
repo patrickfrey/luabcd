@@ -103,13 +103,14 @@ public:
 	std::pair<BigInt,BigInt> div( const BigInt& opr) const;
 	BigInt mod( const BigInt& opr) const;
 	BigInt neg() const;
+	BigInt pow( unsigned long opr) const;
 
 	BigInt shift( int digits) const;
 	BigInt cut( unsigned int digits) const;
 	BigInt round( const BigInt& gran) const;
 
-	void invert_sign()				{m_sign = !m_sign; normalize();}
-	char sign() const noexcept			{return m_sign?'-':'+';}
+	void invert_sign()					{m_sign = !m_sign; normalize();}
+	char sign() const noexcept				{return m_sign?'-':'+';}
 
 	bool operator==( const BigInt& o) const noexcept	{return compare(o)==0;}
 	bool operator!=( const BigInt& o) const noexcept	{return compare(o)!=0;}

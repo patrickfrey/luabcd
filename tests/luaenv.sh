@@ -10,15 +10,15 @@ rm $TMPFILE
 
 addToLUA_CPATH () {
   case ":$LUA_CPATH:" in
-    *";$1"*) :;; # already there
-    *) export LUA_CPATH="$LUA_CPATH;$1";; 
+    *"$1;"*) :;; # already there
+    *) export LUA_CPATH="$1;$LUA_CPATH";;
   esac
 }
 
 addToLUA_PATH () {
   case ":$LUA_PATH:" in
-    *";$1"*) :;; # already there
-    *) export LUA_PATH="$LUA_PATH;$1";; 
+    *"$1;"*) :;; # already there
+    *) export LUA_PATH="$1;$LUA_PATH";;
   esac
 }
 

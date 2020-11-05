@@ -71,5 +71,5 @@ test : all
 check: test
 
 install: all
-	cp $(MODULE) $(CMODPATH)/
+	cp $(MODULE) $(CMODPATH)
 

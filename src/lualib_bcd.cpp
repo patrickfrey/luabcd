@@ -289,10 +289,34 @@ struct LuaMethods
 	{
 		return binop( ls, "bcd:__mul", &bcd::BigInt::mul);
 	}
+	static int pow( lua_State* ls)
+	{
+		[[maybe_unused]] static const char* functionName = "bcd:__pow";
+		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
+		try
+		{
+			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			int nn = lua_gettop( ls);
+			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
+			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
+			if (lua_isnumber( ls, 2))
+			{
+				unsigned long operand = lua_tonumber( ls, 2) + 0.5 + std::numeric_limits<double>::epsilon();
+				UD* res_ud = newuserdata( ls); res_ud->init();
+				res_ud->m_value = ud->m_value.pow( operand);
+			}
+			else
+			{
+				throw std::runtime_error("expected STRING,NUMBER or USERDATA as argument");
+			}
+		}
+		catch (...) { lippincottFunction( ls); }
+		return 1;
+	}
 
 	static int div( lua_State* ls)
 	{
-		[[maybe_unused]] static const char* functionName = "bcd::_div";
+		[[maybe_unused]] static const char* functionName = "bcd:__div";
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
@@ -370,6 +394,7 @@ static const struct luaL_Reg bcd_int_methods[] = {
 	{ "div",		LuaMethods<bcd_int_userdata_t>::div },
 	{ "__mod",		LuaMethods<bcd_int_userdata_t>::mod },
 	{ "__unm",		LuaMethods<bcd_int_userdata_t>::unm },
+	{ "__pow",		LuaMethods<bcd_int_userdata_t>::pow },
 	{ "__lt",		LuaMethods<bcd_int_userdata_t>::lt },
 	{ "__le",		LuaMethods<bcd_int_userdata_t>::le },
 	{ "__eq",		LuaMethods<bcd_int_userdata_t>::eq },

@@ -1,7 +1,7 @@
 ### Description:
 
 This Lua module implements an userdata type for arbitrary big integers as BCD numbers.
-It defines the arithmetic binary operators '+','-','/','*','%' and the unary '-' operator.
+It defines the arithmetic binary operators '+','-','/','*','%','^' and the unary '-' operator.
 
 #### Example
 
@@ -19,6 +19,6 @@ print( result)
 #### Origin
 The BCD numbers implementation originates from the project https://github.com/Wolframe/Wolframe.
 I implemented the module in 2013 for this project that is dead since summer 2014.
-The code is reissued under a new licence (MIT) with the concent of the co-authors of the projects.
+The code is reissued under a new licence (MIT) with the consent of the co-authors of the projects.
 
 
