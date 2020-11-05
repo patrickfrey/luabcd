@@ -26,6 +26,9 @@
 *.a
 *.lib
 
+# Makefile Generated Files
+.depend
+
 # Executables
 *.exe
 *.out
