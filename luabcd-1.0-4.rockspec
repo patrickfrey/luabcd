@@ -1,8 +1,8 @@
 package = "LuaBcd"
-version = "1.0-3"
+version = "1.0-4"
 source = {
    url = "git://github.com/patrickfrey/luabcd",
-   tag = "1.0-3"
+   tag = "1.0-4"
 }
 description = {
    summary = "BCD arithmetic for arbitrary large integers",
@@ -18,8 +18,7 @@ description = {
    license = "MIT"
 }
 dependencies = {
-   "lua >= 5.1, < 5.4"
-   -- tests depend on "penlight", "filesystem"
+   "lua >= 5.1, <= 5.4"
 }
 build = {
    type = "builtin",
