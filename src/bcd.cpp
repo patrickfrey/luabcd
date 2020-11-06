@@ -519,7 +519,7 @@ bool BigInt::const_iterator::isle( const const_iterator& other) const noexcept
 
 static BigInt::Element checkvalue( std::uint64_t a) noexcept
 {
-	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	// thanks to http://homepage.divms.uiowa.edu/~jones/bcd/bcd.html:
 	std::uint64_t t1,t2;
 	t1 = a + 0x0666666666666666ULL;
 	t2 = t1 ^ a;
@@ -528,7 +528,7 @@ static BigInt::Element checkvalue( std::uint64_t a) noexcept
 
 static std::uint64_t add_bcd( std::uint64_t a, std::uint64_t b) noexcept
 {
-	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	// thanks to http://homepage.divms.uiowa.edu/~jones/bcd/bcd.html:
 	std::uint64_t t1,t2,t3,t4,t5,t6;
 	t1 = a + 0x0666666666666666ULL;
 	t2 = t1 + b;
@@ -541,7 +541,7 @@ static std::uint64_t add_bcd( std::uint64_t a, std::uint64_t b) noexcept
 
 static std::uint64_t tencomp( std::uint64_t a) noexcept
 {
-	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	// thanks to http://homepage.divms.uiowa.edu/~jones/bcd/bcd.html:
 	std::uint64_t t1,t2,t3,t4,t5,t6;
 	t1 = 0xffffFFFFffffFFFFULL - a;
 	t2 = (std::uint64_t) (- (std::int64_t)a);
@@ -554,7 +554,7 @@ static std::uint64_t tencomp( std::uint64_t a) noexcept
 
 static std::uint64_t getcarry( std::uint64_t& a) noexcept
 {
-	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	// thanks to http://homepage.divms.uiowa.edu/~jones/bcd/bcd.html:
 	std::uint64_t carry = (a >> 60);
 	a &= 0x0fffFFFFffffFFFFULL;
 	return carry;
@@ -1226,10 +1226,10 @@ std::vector<BigInt> BigInt::getBitValues( int nofBits)
 	return rt;
 }
 
-typedef bool (*BitwiseOp)( bool b1, bool b2) noexcept;
-static bool BitwiseOp_OR( bool b1, bool b2) noexcept	{return b1 | b2;}
-static bool BitwiseOp_AND( bool b1, bool b2) noexcept	{return b1 & b2;}
-static bool BitwiseOp_XOR( bool b1, bool b2) noexcept	{return b1 ^ b2;}
+typedef bool (*BitwiseOp)( bool b1, bool b2);
+static bool BitwiseOp_OR( bool b1, bool b2) 	{return b1 | b2;}
+static bool BitwiseOp_AND( bool b1, bool b2) 	{return b1 & b2;}
+static bool BitwiseOp_XOR( bool b1, bool b2) 	{return b1 ^ b2;}
 
 static BigInt bitwise_op( const BigInt& opr1, const BigInt& opr2, BitwiseOp op, const std::vector<BigInt>& bitvalues)
 {

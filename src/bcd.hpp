@@ -13,13 +13,8 @@
 #ifndef _BCD_ARITHMETIC_HPP_INCLUDED
 #define _BCD_ARITHMETIC_HPP_INCLUDED
 #include <string>
-#include <string_view>
 #include <vector>
 #include <cstdint>
-
-#if __cplusplus < 201703L
-#error Building bcd requires C++17
-#endif
 
 namespace bcd {
 
@@ -76,7 +71,6 @@ public:
 	BigInt& operator=( const BigInt& o)		{copy( o); return *this;}
 	void init( const BigInt& o)			{copy( o);}
 	void init( const std::string& str);
-	void init( const std::string_view& str)		{init( str.data(), str.size());}
 	void init( const char* str, std::size_t strsize);
 	void init( long num);
 	void init( unsigned long num);
