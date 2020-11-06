@@ -1,7 +1,7 @@
 package = "LuaBcd"
 version = "1.0-2"
 source = {
-   url = "https://github.com/patrickfrey/luabcd",
+   url = "git://github.com/patrickfrey/luabcd",
    tag = "1.0-2"
 }
 description = {
