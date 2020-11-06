@@ -27,6 +27,7 @@ build = {
 	       sources = {"src/bcd.cpp", "src/lualib_bcd.cpp"},
 	       incdirs = {"src/"}
       }
-   }
+   },
+   copy_directories = { "tests" }
 }
 
