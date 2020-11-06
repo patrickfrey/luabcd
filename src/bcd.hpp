@@ -14,6 +14,7 @@
 #define _BCD_ARITHMETIC_HPP_INCLUDED
 #include <string>
 #include <string_view>
+#include <vector>
 #include <cstdint>
 
 #if __cplusplus < 201703L
@@ -104,6 +105,21 @@ public:
 	BigInt mod( const BigInt& opr) const;
 	BigInt neg() const;
 	BigInt pow( unsigned long opr) const;
+
+	//\brief Get Values of bits needed for bitwise operations
+	static std::vector<BigInt> getBitValues( int nofBits);
+	//\brief Bitwise AND
+	//\note This operation is very inefficient on BCD
+	BigInt bitwise_and( const BigInt& opr, const std::vector<BigInt>& bitvalues) const;
+	//\brief Bitwise OR
+	//\note This operation is very inefficient on BCD
+	BigInt bitwise_or( const BigInt& opr, const std::vector<BigInt>& bitvalues) const;
+	//\brief Bitwise XOR
+	//\note This operation is very inefficient on BCD
+	BigInt bitwise_xor( const BigInt& opr, const std::vector<BigInt>& bitvalues) const;
+	//\brief Bitwise NOT
+	//\note This operation is very inefficient on BCD
+	BigInt bitwise_not( const std::vector<BigInt>& bitvalues) const;
 
 	BigInt shift( int digits) const;
 	BigInt cut( unsigned int digits) const;

@@ -301,6 +301,7 @@ void BigInt::init( const char* str, std::size_t strsize)
 
 void BigInt::init( long num)
 {
+	init();
 	bool ng = false;
 	if (num < 0)
 	{
@@ -314,12 +315,14 @@ void BigInt::init( long num)
 
 void BigInt::init( unsigned long num)
 {
+	init();
 	BigInt th = estimate_as_bcd( (FactorType)num, 0);
 	copy( th);
 }
 
 void BigInt::init( double num)
 {
+	init();
 	BigInt th = estimate_as_bcd( (FactorType)(num+0.5-std::numeric_limits<double>::epsilon()), 0);
 	copy( th);
 }
@@ -551,6 +554,7 @@ static std::uint64_t tencomp( std::uint64_t a) noexcept
 
 static std::uint64_t getcarry( std::uint64_t& a) noexcept
 {
+	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
 	std::uint64_t carry = (a >> 60);
 	a &= 0x0fffFFFFffffFFFFULL;
 	return carry;
@@ -1202,6 +1206,116 @@ BigInt BigInt::pow( unsigned long opr) const
 		if (opr & mask)
 		{
 			rt = rt * ar[ ai];
+		}
+	}
+	return rt;
+}
+
+std::vector<BigInt> BigInt::getBitValues( int nofBits)
+{
+	std::vector<BigInt> rt;
+	rt.reserve( nofBits);
+	if (nofBits > 0)
+	{
+		rt.push_back( BigInt( "1", 1));
+		for (int bi=1; bi < nofBits; ++bi)
+		{
+			rt.push_back( rt[ bi-1] * 2);
+		}
+	}
+	return rt;
+}
+
+typedef bool (*BitwiseOp)( bool b1, bool b2) noexcept;
+static bool BitwiseOp_OR( bool b1, bool b2) noexcept	{return b1 | b2;}
+static bool BitwiseOp_AND( bool b1, bool b2) noexcept	{return b1 & b2;}
+static bool BitwiseOp_XOR( bool b1, bool b2) noexcept	{return b1 ^ b2;}
+
+static BigInt bitwise_op( const BigInt& opr1, const BigInt& opr2, BitwiseOp op, const std::vector<BigInt>& bitvalues)
+{
+	std::size_t nofBits1 = (0.5 + (opr1.nof_digits() * 3.3219281)) /* estimate bigger than maximum */;
+	std::size_t nofBits2 = (0.5 + (opr2.nof_digits() * 3.3219281)) /* estimate bigger than maximum */;
+	std::size_t nofBits = std::max( nofBits1, nofBits2);
+
+	if (nofBits >= bitvalues.size()) nofBits = bitvalues.size();
+
+	std::vector<bool> arg1( bitvalues.size(), false);
+	std::vector<bool> arg2( bitvalues.size(), false);
+
+	BigInt rest1 = opr1;
+	BigInt rest2 = opr2;
+
+	for (std::size_t bi = nofBits; bi > 0; --bi)
+	{
+		if (bitvalues[ bi-1] <= rest1)
+		{
+			rest1 = rest1 - bitvalues[ bi-1];
+			arg1[ bi-1] = true;
+		}
+		if (bitvalues[ bi-1] <= rest2)
+		{
+			rest2 = rest2 - bitvalues[ bi-1];
+			arg2[ bi-1] = true;
+		}
+	}
+	std::vector<bool> res_bitwise( bitvalues.size(), false);
+	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	{
+		res_bitwise[ bi] = op( arg1[ bi], arg2[ bi]);
+	}
+	BigInt rt( "0", 1);
+	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	{
+		if (res_bitwise[ bi])
+		{
+			rt = rt + bitvalues[ bi];
+		}
+	}
+	return rt;
+}
+
+BigInt BigInt::bitwise_and( const BigInt& opr, const std::vector<BigInt>& bitvalues) const
+{
+	return bitwise_op( *this, opr, &BitwiseOp_AND, bitvalues);
+}
+
+BigInt BigInt::bitwise_or( const BigInt& opr, const std::vector<BigInt>& bitvalues) const
+{
+	return bitwise_op( *this, opr, &BitwiseOp_OR, bitvalues);
+}
+
+BigInt BigInt::bitwise_xor( const BigInt& opr, const std::vector<BigInt>& bitvalues) const
+{
+	return bitwise_op( *this, opr, &BitwiseOp_XOR, bitvalues);
+}
+
+BigInt BigInt::bitwise_not( const std::vector<BigInt>& bitvalues) const
+{
+	std::size_t nofBits = 0.5 + (nof_digits() * 3.3219281) /* estimate bigger than maximum */;
+	if (nofBits >= bitvalues.size()) nofBits = bitvalues.size();
+
+	std::vector<bool> arg( bitvalues.size(), false);
+	BigInt rest = *this;
+
+	for (std::size_t bi = nofBits; bi > 0; --bi)
+	{
+		if (bitvalues[ bi-1] <= rest)
+		{
+			rest = rest - bitvalues[ bi-1];
+			arg[ bi-1] = true;
+		}
+	}
+	std::vector<bool> res_bitwise( bitvalues.size(), true);
+	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	{
+		res_bitwise[ bi] = !arg[ bi];
+	}
+	BigInt rt( "0", 1);
+	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	{
+		if (res_bitwise[ bi])
+		{
+			rt = rt + bitvalues[ bi];
 		}
 	}
 	return rt;

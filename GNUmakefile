@@ -73,3 +73,6 @@ check: test
 install: all
 	cp $(MODULE) $(CMODPATH)
 
+uninstall:
+	rm $(CMODPATH)/bcd.so
+

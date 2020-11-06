@@ -92,6 +92,64 @@ public:
 	bcd::BigInt m_value;
 };
 
+struct bcd_bits_userdata_t
+{
+public:
+	typedef std::vector<bcd::BigInt> ValueType;
+
+	void init() noexcept
+	{
+		new (&m_ar) std::vector<bcd::BigInt>();
+	}
+	void create( std::vector<bcd::BigInt>&& ar_)
+	{
+		m_ar = std::move( ar_);
+	}
+	void destroy( lua_State* ls) noexcept
+	{
+		m_ar.~ValueType();
+	}
+	static const char* metatableName() noexcept {return "bcd.bits";}
+
+	std::vector<bcd::BigInt> m_ar;
+};
+
+static int bcd_bits_gc( lua_State* ls)
+{
+	[[maybe_unused]] static const char* functionName = "bcd.bits:__gc";
+	bcd_bits_userdata_t* ud = (bcd_bits_userdata_t*)luaL_checkudata( ls, 1, bcd_bits_userdata_t::metatableName());
+	try
+	{
+		int nn = lua_gettop( ls);
+		if (nn > 1) throw std::runtime_error("too many arguments calling __gc");
+	}
+	catch (...) { lippincottFunction( ls); }
+
+	ud->destroy( ls);
+	return 0;
+}
+
+static int bcd_bits_create( lua_State* ls)
+{
+	try
+	{
+		int nn = lua_gettop( ls);
+		if (nn < 1) throw std::runtime_error( "too few arguments calling 'bits'");
+		if (nn > 1) throw std::runtime_error( "too many arguments calling 'bits'");
+		if (lua_type( ls, 1) != LUA_TNUMBER)
+		{
+			throw std::runtime_error("integer expected as argument of 'bits'");
+		}
+		int nofBits = lua_tointeger( ls, 1);
+		bcd_bits_userdata_t* rt = (bcd_bits_userdata_t*)lua_newuserdata( ls, sizeof(bcd_bits_userdata_t));
+		luaL_getmetatable( ls, bcd_bits_userdata_t::metatableName());
+		lua_setmetatable( ls, -2);
+		rt->create( bcd::BigInt::getBitValues( nofBits));
+	}
+	catch (...) { lippincottFunction( ls); }
+	return 1;
+}
+
 template <class UD>
 struct LuaMethods
 {
@@ -121,7 +179,7 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					ud->m_value.init( lua_tonumber( ls, 1));
+					ud->m_value.init( lua_tointeger( ls, 1));
 					break;
 				}
 				case LUA_TUSERDATA:
@@ -158,7 +216,7 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn > 1) throw std::runtime_error("too many arguments calling __tostring");
 			std::string val = ud->m_value.tostring();
@@ -175,7 +233,7 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
@@ -191,7 +249,7 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tonumber( ls, 2));
+					bcd::BigInt operand( lua_tointeger( ls, 2));
 					lua_pushboolean( ls, (ud->m_value.*Method)( operand));
 					break;
 				}
@@ -214,7 +272,7 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
@@ -232,7 +290,7 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tonumber( ls, 2));
+					bcd::BigInt operand( lua_tointeger( ls, 2));
 					UD* res_ud = newuserdata( ls);
 					res_ud->init();
 					res_ud->m_value = (ud->m_value.*Method)( operand);
@@ -259,7 +317,7 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn < 1) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
@@ -295,13 +353,13 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
 			if (lua_isnumber( ls, 2))
 			{
-				unsigned long operand = lua_tonumber( ls, 2) + 0.5 + std::numeric_limits<double>::epsilon();
+				unsigned long operand = lua_tointeger( ls, 2);
 				UD* res_ud = newuserdata( ls); res_ud->init();
 				res_ud->m_value = ud->m_value.pow( operand);
 			}
@@ -320,7 +378,7 @@ struct LuaMethods
 		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
 		try
 		{
-			if (!lua_checkstack( ls, 6)) throw std::bad_alloc();
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
 			int nn = lua_gettop( ls);
 			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
@@ -340,7 +398,7 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tonumber( ls, 2));
+					bcd::BigInt operand( lua_tointeger( ls, 2));
 					UD* res1_ud = newuserdata( ls); res1_ud->init();
 					UD* res2_ud = newuserdata( ls); res2_ud->init();
 					std::pair<bcd::BigInt,bcd::BigInt> rr = (ud->m_value.div)( operand);
@@ -384,6 +442,107 @@ struct LuaMethods
 	}
 };
 
+struct BitwiseBigIntLuaMethods
+{
+	typedef bcd_int_userdata_t UD;
+
+	static UD* newuserdata( lua_State* ls) noexcept
+	{
+		UD* rt = (UD*)lua_newuserdata( ls, sizeof(UD));
+		luaL_getmetatable( ls, UD::metatableName());
+		lua_setmetatable( ls, -2);
+		return rt;
+	}
+
+	static int binop( lua_State* ls, const char* functionName, bcd::BigInt (bcd::BigInt::*Method)( const bcd::BigInt&, const std::vector<bcd::BigInt>&) const)
+	{
+		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
+		try
+		{
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
+			int nn = lua_gettop( ls);
+			if (nn < 3) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
+			if (nn > 3) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
+
+			bcd_bits_userdata_t* bd = (bcd_bits_userdata_t*)luaL_checkudata( ls, 3, bcd_bits_userdata_t::metatableName());
+			switch (lua_type( ls, 2))
+			{
+				case LUA_TSTRING:
+				{
+					std::size_t len;
+					const char* str = lua_tolstring( ls, 2, &len);
+					bcd::BigInt operand( str, len);
+					UD* res_ud = newuserdata( ls);
+					res_ud->init();
+					res_ud->m_value = (ud->m_value.*Method)( operand, bd->m_ar);
+					break;
+				}
+				case LUA_TNUMBER:
+				{
+					bcd::BigInt operand( lua_tointeger( ls, 2));
+					UD* res_ud = newuserdata( ls);
+					res_ud->init();
+					res_ud->m_value = (ud->m_value.*Method)( operand, bd->m_ar);
+					break;
+				}
+				case LUA_TUSERDATA:
+				{
+					UD* operand_ud = (UD*)luaL_checkudata( ls, 2, UD::metatableName());
+					UD* res_ud = newuserdata( ls);
+					res_ud->init();
+					res_ud->m_value = (ud->m_value.*Method)( operand_ud->m_value, bd->m_ar);
+					break;
+				}
+				default:
+					throw std::runtime_error("expected STRING,NUMBER or USERDATA as argument");
+			}
+		}
+		catch (...) { lippincottFunction( ls); }
+		return 1;
+	}
+
+	static int unop( lua_State* ls, const char* functionName, bcd::BigInt (bcd::BigInt::*Method)( const std::vector<bcd::BigInt>&) const)
+	{
+		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
+		try
+		{
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
+			int nn = lua_gettop( ls);
+			if (nn < 2) throw std::runtime_error( std::string("too few arguments calling ") + functionName);
+			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
+
+			bcd_bits_userdata_t* bd = (bcd_bits_userdata_t*)luaL_checkudata( ls, 2, bcd_bits_userdata_t::metatableName());
+			UD* res_ud = newuserdata( ls);
+			res_ud->init();
+			res_ud->m_value = (ud->m_value.*Method)( bd->m_ar);
+		}
+		catch (...) { lippincottFunction( ls); }
+		return 1;
+	}
+
+	static int bitwise_and( lua_State* ls)
+	{
+		return binop( ls, "bcd:and", &bcd::BigInt::bitwise_and);
+	}
+	static int bitwise_or( lua_State* ls)
+	{
+		return binop( ls, "bcd:or", &bcd::BigInt::bitwise_or);
+	}
+	static int bitwise_xor( lua_State* ls)
+	{
+		return binop( ls, "bcd:xor", &bcd::BigInt::bitwise_xor);
+	}
+	static int bitwise_not( lua_State* ls)
+	{
+		return unop( ls, "bcd:not", &bcd::BigInt::bitwise_not);
+	}
+};
+
+static const struct luaL_Reg bcd_bits_methods[] = {
+	{ "__gc",		bcd_bits_gc },
+	{ nullptr,		nullptr }
+};
+
 static const struct luaL_Reg bcd_int_methods[] = {
 	{ "__gc",		LuaMethods<bcd_int_userdata_t>::gc },
 	{ "__tostring",		LuaMethods<bcd_int_userdata_t>::tostring },
@@ -401,8 +560,17 @@ static const struct luaL_Reg bcd_int_methods[] = {
 	{ nullptr,		nullptr }
 };
 
+static const struct luaL_Reg bcd_int_bitwise_methods[] = {
+	{"bit_and",		BitwiseBigIntLuaMethods::bitwise_and },
+	{"bit_or",		BitwiseBigIntLuaMethods::bitwise_or },
+	{"bit_xor",		BitwiseBigIntLuaMethods::bitwise_xor },
+	{"bit_not",		BitwiseBigIntLuaMethods::bitwise_not },
+	{ nullptr,		nullptr }
+};
+
 static const struct luaL_Reg bcd_functions[] = {
 	{ "int",		LuaMethods<bcd_int_userdata_t>::create },
+	{ "bits",		bcd_bits_create },
 	{ nullptr,  		nullptr }
 };
 
@@ -419,6 +587,10 @@ extern "C" int luaopen_bcd( lua_State* ls);
 DLL_PUBLIC int luaopen_bcd( lua_State* ls)
 {
 	createMetatable( ls, bcd_int_userdata_t::metatableName(), bcd_int_methods);
+	luaL_setfuncs( ls, bcd_int_bitwise_methods, 0);
+
+	createMetatable( ls, bcd_bits_userdata_t::metatableName(), bcd_bits_methods);
+
 	luaL_newlib( ls, bcd_functions);
 	return 1;
 }

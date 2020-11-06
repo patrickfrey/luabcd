@@ -15,7 +15,7 @@ local verbose = args.verbose
 function checkResult( testname, output, expected)
 	if not output:__eq(expected) then
 		io.stderr:write( "OUPUT:  " .. tostring(output) .. "\n")
-		io.stderr:write( "EXPECT: " .. expected .. "\n")
+		io.stderr:write( "EXPECT: " .. tostring(expected) .. "\n")
 		error( "Test " .. testname .. " failed")
 	end
 end
@@ -85,6 +85,40 @@ function test_pow( arg1, arg2, expect)
 	checkResult( "mod", result, expect)
 end
 
+local bits64 = bcd.bits(64)
+
+function test_bitwise_and( arg1, arg2, expect)
+	local result = bcd.int( arg1):bit_and( arg2, bits64)
+	if verbose then
+		print( "Test bcd.int( " .. arg1 .. "):bit_and( " .. arg2 .. ", bits64)\n = " .. tostring(result))
+	end
+	checkResult( "mod", result, expect)
+end
+
+function test_bitwise_or( arg1, arg2, expect)
+	local result = bcd.int( arg1):bit_or( arg2, bits64)
+	if verbose then
+		print( "Test bcd.int( " .. arg1 .. "):bit_or( " .. arg2 .. ", bits64)\n = " .. tostring(result))
+	end
+	checkResult( "mod", result, expect)
+end
+
+function test_bitwise_xor( arg1, arg2, expect)
+	local result = bcd.int( arg1):bit_xor( arg2, bits64)
+	if verbose then
+		print( "Test bcd.int( " .. arg1 .. "):bit_xor( " .. arg2 .. ", bits64)\n = " .. tostring(result))
+	end
+	checkResult( "mod", result, expect)
+end
+
+function test_bitwise_not( arg, expect)
+	local result = bcd.int( arg):bit_not( bits64)
+	if verbose then
+		print( "Test bcd.int( " .. arg1 .. "):bit_not( bits64)\n = " .. tostring(result))
+	end
+	checkResult( "mod", result, expect)
+end
+
 test_add( "1091274089731205741574315105408501238459018244", "09837450983259878234932079584098479356329382873490537340570384",
 		"9837450983259879326206169315304220930644488281991775799588628")
 test_sub( "9082873327498632874670832947632592380417269304829645738789127340936479873287459875943",
@@ -121,4 +155,11 @@ test_pow( "3432", "324",
 		"33691116060472959502025027634958237190003423128920297045827782588699" ..
 		"3090255435128824256023942282058827464021476042241921253376" )
 
+test_bitwise_and( "3", "1", "1" )
+test_bitwise_and( "29341730247", "918273", "393473" )
+test_bitwise_or( "434254654", "983476324", "1006549886" )
+test_bitwise_xor( "434254654", "983476324", "595368794" )
+test_bitwise_not( "434254654", bcd.int( "434254654"):bit_xor( bcd.int(2) ^ 64 - 1, bits64) )
+
 print( "OK")
+
