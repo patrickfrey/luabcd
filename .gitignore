@@ -27,7 +27,7 @@
 *.lib
 
 # LuaRocks generated files
-luabcd-1.0-1.src.rock
+*.src.rock
 
 # Make/configure Generated Files
 .depend
