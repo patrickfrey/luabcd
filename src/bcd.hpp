@@ -86,6 +86,7 @@ public:
 	std::pair<BigInt,BigInt> operator /( const BigInt& opr) const	{return div( opr);}
 	BigInt operator *( const BigInt& opr) const			{return mul( opr);}
 	BigInt operator *( long opr) const				{return mul( opr);}
+	BigInt operator %( const BigInt& opr) const			{return mod( opr);}
 	BigInt operator +( const BigInt& opr) const			{return add( opr);}
 	BigInt operator -( const BigInt& opr) const			{return sub( opr);}
 	BigInt operator -() const					{return neg();}

@@ -1215,12 +1215,12 @@ std::vector<BigInt> BigInt::getBitValues( int nofBits)
 {
 	std::vector<BigInt> rt;
 	rt.reserve( nofBits);
+	rt.push_back( BigInt( "1", 1));
 	if (nofBits > 0)
 	{
-		rt.push_back( BigInt( "1", 1));
-		for (int bi=1; bi < nofBits; ++bi)
+		for (int bi=0; bi < nofBits; ++bi)
 		{
-			rt.push_back( rt[ bi-1] * 2);
+			rt.push_back( rt[ bi] * 2);
 		}
 	}
 	return rt;
@@ -1233,17 +1233,25 @@ static bool BitwiseOp_XOR( bool b1, bool b2) 	{return b1 ^ b2;}
 
 static BigInt bitwise_op( const BigInt& opr1, const BigInt& opr2, BitwiseOp op, const std::vector<BigInt>& bitvalues)
 {
+	if ((opr1.sign() == '-' && !opr1.isNull()) || (opr2.sign() == '-' && !opr2.isNull()))
+	{
+		throw std::runtime_error("Bitwise logical operators not permitted on negative numbers");
+	}
+	BigInt rt( "0", 1);
+
 	std::size_t nofBits1 = (0.5 + (opr1.nof_digits() * 3.3219281)) /* estimate bigger than maximum */;
 	std::size_t nofBits2 = (0.5 + (opr2.nof_digits() * 3.3219281)) /* estimate bigger than maximum */;
 	std::size_t nofBits = std::max( nofBits1, nofBits2);
 
-	if (nofBits >= bitvalues.size()) nofBits = bitvalues.size();
+	if (bitvalues.empty()) return rt;
+	std::size_t bitwidth = bitvalues.size()-1;
+	if (nofBits >= bitvalues.size()) nofBits = bitwidth;
 
-	std::vector<bool> arg1( bitvalues.size(), false);
-	std::vector<bool> arg2( bitvalues.size(), false);
+	std::vector<bool> arg1( bitwidth, false);
+	std::vector<bool> arg2( bitwidth, false);
 
-	BigInt rest1 = opr1;
-	BigInt rest2 = opr2;
+	BigInt rest1 = opr1 < bitvalues.back() ? opr1 : (opr1 % bitvalues.back());
+	BigInt rest2 = opr2 < bitvalues.back() ? opr2 : (opr2 % bitvalues.back());
 
 	for (std::size_t bi = nofBits; bi > 0; --bi)
 	{
@@ -1258,13 +1266,12 @@ static BigInt bitwise_op( const BigInt& opr1, const BigInt& opr2, BitwiseOp op, 
 			arg2[ bi-1] = true;
 		}
 	}
-	std::vector<bool> res_bitwise( bitvalues.size(), false);
-	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	std::vector<bool> res_bitwise( bitwidth, false);
+	for (std::size_t bi = 0; bi < bitwidth; ++bi)
 	{
 		res_bitwise[ bi] = op( arg1[ bi], arg2[ bi]);
 	}
-	BigInt rt( "0", 1);
-	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	for (std::size_t bi = 0; bi < bitwidth; ++bi)
 	{
 		if (res_bitwise[ bi])
 		{
@@ -1291,11 +1298,19 @@ BigInt BigInt::bitwise_xor( const BigInt& opr, const std::vector<BigInt>& bitval
 
 BigInt BigInt::bitwise_not( const std::vector<BigInt>& bitvalues) const
 {
+	if (sign() == '-' && !isNull())
+	{
+		throw std::runtime_error("Bitwise logical operators not permitted on negative numbers");
+	}
+	BigInt rt( "0", 1);
 	std::size_t nofBits = 0.5 + (nof_digits() * 3.3219281) /* estimate bigger than maximum */;
-	if (nofBits >= bitvalues.size()) nofBits = bitvalues.size();
 
-	std::vector<bool> arg( bitvalues.size(), false);
-	BigInt rest = *this;
+	if (bitvalues.empty()) return rt;
+	std::size_t bitwidth = bitvalues.size()-1;
+	if (nofBits >= bitvalues.size()) nofBits = bitwidth;
+
+	std::vector<bool> arg( bitwidth, false);
+	BigInt rest = *this < bitvalues.back() ? *this : (*this % bitvalues.back());
 
 	for (std::size_t bi = nofBits; bi > 0; --bi)
 	{
@@ -1305,13 +1320,12 @@ BigInt BigInt::bitwise_not( const std::vector<BigInt>& bitvalues) const
 			arg[ bi-1] = true;
 		}
 	}
-	std::vector<bool> res_bitwise( bitvalues.size(), true);
-	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	std::vector<bool> res_bitwise( bitwidth, true);
+	for (std::size_t bi = 0; bi < bitwidth; ++bi)
 	{
 		res_bitwise[ bi] = !arg[ bi];
 	}
-	BigInt rt( "0", 1);
-	for (std::size_t bi = 0; bi < bitvalues.size(); ++bi)
+	for (std::size_t bi = 0; bi < bitwidth; ++bi)
 	{
 		if (res_bitwise[ bi])
 		{

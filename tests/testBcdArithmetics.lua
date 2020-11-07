@@ -114,7 +114,7 @@ end
 function test_bitwise_not( arg, expect)
 	local result = bcd.int( arg):bit_not( bits64)
 	if verbose then
-		print( "Test bcd.int( " .. arg1 .. "):bit_not( bits64)\n = " .. tostring(result))
+		print( "Test bcd.int( " .. arg .. "):bit_not( bits64)\n = " .. tostring(result))
 	end
 	checkResult( "mod", result, expect)
 end
