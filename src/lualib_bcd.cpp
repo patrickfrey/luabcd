@@ -226,6 +226,20 @@ struct LuaMethods
 		return 1;
 	}
 
+	static int tonumber( lua_State* ls)
+	{
+		UD* ud = (UD*)luaL_checkudata( ls, 1, UD::metatableName());
+		try
+		{
+			if (!lua_checkstack( ls, 3)) throw std::bad_alloc();
+			int nn = lua_gettop( ls);
+			if (nn > 1) throw std::runtime_error("too many arguments calling tonumber");
+			lua_pushnumber( ls, ud->m_value.todouble());
+		}
+		catch (...) { lippincottFunction( ls); }
+		return 1;
+	}
+
 	typedef typename UD::ValueType ValueType;
 
 	static int cmpop( lua_State* ls, const char* functionName, bool (ValueType::*Method)( const ValueType&) const noexcept)
@@ -546,6 +560,7 @@ static const struct luaL_Reg bcd_bits_methods[] = {
 static const struct luaL_Reg bcd_int_methods[] = {
 	{ "__gc",		LuaMethods<bcd_int_userdata_t>::gc },
 	{ "__tostring",		LuaMethods<bcd_int_userdata_t>::tostring },
+	{ "tonumber",		LuaMethods<bcd_int_userdata_t>::tonumber },
 	{ "__add",		LuaMethods<bcd_int_userdata_t>::add },
 	{ "__sub",		LuaMethods<bcd_int_userdata_t>::sub },
 	{ "__mul",		LuaMethods<bcd_int_userdata_t>::mul },
