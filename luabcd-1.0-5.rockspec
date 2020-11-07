@@ -7,7 +7,8 @@ source = {
 description = {
    summary = "BCD arithmetic for arbitrary large integers",
    detailed = [[
-      Implements an ADT for arbitrary large integers with the arithmetic operators  +  -  / *  ^ .
+      Implements an ADT for arbitrary large integers with the arithmetic operators  +  -  / *  ^ and the
+      comparison operators  ==  ~=  <=  <  >=  and  >.
       The numbers are internally represented as binary coded decimals (BCD) in blocks of 64 bit, each holding 16 decimal digits.
       The implementation is based on "BCD Arithmetic, a tutorial" (http://homepage.divms.uiowa.edu/~jones/bcd/bcd.html)
       by Douglas W. Jones from the University of Iowa.
