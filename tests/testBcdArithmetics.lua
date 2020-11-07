@@ -13,7 +13,7 @@ end
 local verbose = args.verbose
 
 function checkResult( testname, output, expected)
-	if not output:__eq(expected) then
+	if not output == expected then
 		io.stderr:write( "OUPUT:  " .. tostring(output) .. "\n")
 		io.stderr:write( "EXPECT: " .. tostring(expected) .. "\n")
 		error( "Test " .. testname .. " failed")
