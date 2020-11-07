@@ -1,6 +1,6 @@
 ### Description
 This Lua module written in C++ implements an userdata type for arbitrary big integers as BCD numbers.
-It defines the arithmetic binary operators  **+** **-** **/** ** * ** **%** **^** and the unary **-** operator.
+It defines the arithmetic binary operators  **+** **-** **/** * **%** **^** and the unary **-** operator.
 
 #### Example
 
