@@ -263,7 +263,8 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tointeger( ls, 2));
+					long intarg = lua_tointeger( ls, 2);
+					bcd::BigInt operand( intarg);
 					lua_pushboolean( ls, (ud->m_value.*Method)( operand));
 					break;
 				}
@@ -304,7 +305,8 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tointeger( ls, 2));
+					long intarg = lua_tointeger( ls, 2);
+					bcd::BigInt operand( intarg);
 					UD* res_ud = newuserdata( ls);
 					res_ud->init();
 					res_ud->m_value = (ud->m_value.*Method)( operand);
@@ -373,7 +375,8 @@ struct LuaMethods
 			if (nn > 2) throw std::runtime_error( std::string("too many arguments calling ") + functionName);
 			if (lua_isnumber( ls, 2))
 			{
-				unsigned long operand = lua_tointeger( ls, 2);
+				long operand = lua_tointeger( ls, 2);
+				if (operand < 0) throw std::runtime_error( std::string("expected non negative integer as argument for ") + functionName);
 				UD* res_ud = newuserdata( ls); res_ud->init();
 				res_ud->m_value = ud->m_value.pow( operand);
 			}
@@ -412,7 +415,8 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tointeger( ls, 2));
+					long intarg = lua_tointeger( ls, 2);
+					bcd::BigInt operand( intarg);
 					UD* res1_ud = newuserdata( ls); res1_ud->init();
 					UD* res2_ud = newuserdata( ls); res2_ud->init();
 					std::pair<bcd::BigInt,bcd::BigInt> rr = (ud->m_value.div)( operand);
@@ -493,7 +497,8 @@ struct BitwiseBigIntLuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					bcd::BigInt operand( lua_tointeger( ls, 2));
+					long intarg = lua_tointeger( ls, 2);
+					bcd::BigInt operand( intarg);
 					UD* res_ud = newuserdata( ls);
 					res_ud->init();
 					res_ud->m_value = (ud->m_value.*Method)( operand, bd->m_ar);
