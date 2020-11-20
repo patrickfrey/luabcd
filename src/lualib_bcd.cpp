@@ -179,7 +179,8 @@ struct LuaMethods
 				}
 				case LUA_TNUMBER:
 				{
-					ud->m_value.init( lua_tointeger( ls, 1));
+					long operand = lua_tointeger( ls, 1);
+					ud->m_value.init( operand);
 					break;
 				}
 				case LUA_TUSERDATA:
