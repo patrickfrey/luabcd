@@ -142,6 +142,7 @@ static int bcd_bits_create( lua_State* ls)
 		}
 		int nofBits = lua_tointeger( ls, 1);
 		bcd_bits_userdata_t* rt = (bcd_bits_userdata_t*)lua_newuserdata( ls, sizeof(bcd_bits_userdata_t));
+		rt->init();
 		luaL_getmetatable( ls, bcd_bits_userdata_t::metatableName());
 		lua_setmetatable( ls, -2);
 		rt->create( bcd::BigInt::getBitValues( nofBits));
