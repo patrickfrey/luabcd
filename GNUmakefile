@@ -35,7 +35,7 @@ MAKEDEP  := Lua.inc GNUmakefile configure
 SRCDIR   := src
 TESTDIR  := tests
 DOCDIR   := doc
-STDFLAGS := -std=c++11
+STDFLAGS := -std=c++17
 CXXFLAGS := -c $(STDFLAGS) $(CXXVBFLAGS) $(DEBUGFLAGS) -fPIC -Wall -Wshadow -pedantic -Wfatal-errors -fvisibility=hidden -pthread
 INCFLAGS := -I$(SRCDIR) -I$(LUAINC)
 LDFLAGS  := -g -pthread

@@ -1,8 +1,8 @@
 package = "LuaBcd"
-version = "1.0-9"
+version = "1.0-10"
 source = {
    url = "git://github.com/patrickfrey/luabcd",
-   tag = "1.0-9"
+   tag = "1.0-10"
 }
 description = {
    summary = "BCD arithmetic for arbitrary large integers",
@@ -20,13 +20,9 @@ dependencies = {
    "lua >= 5.1, <= 5.4"
 }
 build = {
-   type = "builtin",
-   modules = {
-      bcd = {
-	       sources = {"src/bcd.cpp", "src/lualib_bcd.cpp"},
-	       incdirs = {"src/"},
-	       libraries = {"stdc++"},
-      }
+   type = "make",
+   build = {
+      makefile = "GNUmakefile"
    },
    copy_directories = { "tests" }
 }
