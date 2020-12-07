@@ -8,44 +8,44 @@ Cmake with gcc or clang with C++11 support.
 Install packages with 'apt-get'/aptitude.
 
 #### Required packages
-	lua5.2 liblua5.2-dev luarocks llvm
+lua5.2 liblua5.2-dev luarocks llvm
 
 #### Required luarocks packages
-	penlight
+penlight
 
 ### Install with LuaRocks
 ```Bash
-	luarocks install LuaBcd
+luarocks install LuaBcd
 ```
 
 ### Build from github
 #### Fetch sources
 ```Bash
-	git clone https://github.com/patrickfrey/lua_bcd
-	cd lua_bcd
+git clone https://github.com/patrickfrey/lua_bcd
+cd lua_bcd
 ```
 #### Configure to find Lua includes and to write the file Lua.inc included by make
 ```Bash
-	./configure
+./configure
 ```
 
 #### Build with GNU C/C++
 ```Bash
-	make -DCOMPILER=gcc -DRELEASE=true
+make -DCOMPILER=gcc -DRELEASE=true
 ```
 
 #### Build with Clang C/C++
 ```Bash
-	make -DCOMPILER=clang -DRELEASE=true
+make -DCOMPILER=clang -DRELEASE=true
 ```
 
 #### Run tests
 ```Bash
-	make test
+make test
 ```
 
 #### Install
 ```Bash
-	make PREFIX=/usr/local install
+make PREFIX=/usr/local install
 ```
 

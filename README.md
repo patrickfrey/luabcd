@@ -22,3 +22,6 @@ from Douglas W. Jones from the University of Iowa.
 I implemented it in 2013 for the project https://github.com/Wolframe/Wolframe that is dead since summer 2014.
 The code is now reissued under a new licence (MIT) with the consent of the co-authors of the projects.
 
+#### Installation
+[Installation](INSTALL.Ubuntu.md)
+
