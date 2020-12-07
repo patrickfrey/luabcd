@@ -1,3 +1,11 @@
+## Installation with LuaRocks
+----------------------------
+```Bash
+luarocks install penlight
+luarocks install LuaBcd
+```
+
+
 ## Ubuntu 20.04 on x86_64, i686
 ----------------------------
 
@@ -12,11 +20,6 @@ lua5.2 liblua5.2-dev luarocks llvm
 
 #### Required luarocks packages
 penlight
-
-### Install with LuaRocks
-```Bash
-luarocks install LuaBcd
-```
 
 ### Build from github
 #### Fetch sources
