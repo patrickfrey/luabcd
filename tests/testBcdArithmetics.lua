@@ -161,5 +161,8 @@ test_bitwise_or( "434254654", "983476324", "1006549886" )
 test_bitwise_xor( "434254654", "983476324", "595368794" )
 test_bitwise_not( "434254654", bcd.int( "434254654"):bit_xor( bcd.int(2) ^ 64 - 1, bits64) )
 
+checkResult( "BCD from float", tostring(bcd.int(7.23)), "7")
+if verbose then print( "Test BCD from float 7.23 = 7") end
+
 print( "OK")
 
