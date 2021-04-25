@@ -34,6 +34,9 @@
 Lua.inc
 
 # Executables
-*.exe
-*.out
-*.app
+build/*.exe
+build/*.out
+build/*.app
+build/*.i*86
+build/*.x86_64
+build/*.hex

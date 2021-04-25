@@ -10,6 +10,7 @@
 ///\file lualib_bcd.cpp
 ///\brief Implements the Lua ADT for BCD arithmetics
 #include "bcd.hpp"
+#include "lua_5_1.hpp"
 #include "export.hpp"
 #include <limits>
 #include <stdexcept>
