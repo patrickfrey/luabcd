@@ -1,8 +1,8 @@
 package = "LuaBcd"
-version = "1.0-11"
+version = "1.0-12"
 source = {
    url = "git://github.com/patrickfrey/luabcd",
-   tag = "1.0-11"
+   tag = "1.0-12"
 }
 description = {
    summary = "BCD arithmetic for arbitrary large integers",
